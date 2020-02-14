@@ -32,9 +32,9 @@ var myArray = [];
 
 async function fetchBeatSaver(songID) {
   var url = 'https://beatsaver.com/api/maps/detail/' + songID;
-  console.log('The songID is ' + songID);
-  console.log('The songDifficulty is ' + songDifficulty);
-  console.log('The score is ' + score);
+  // console.log('The songID is ' + songID);
+  // console.log('The songDifficulty is ' + songDifficulty);
+  // console.log('The score is ' + score);
   const response = await fetch(url).catch(console.error);
   const data = await response.json();
   // console.log(data);
@@ -100,6 +100,12 @@ function calculateAccuracy(noteCount, score) {
   console.log('Your accuracy is ' + accuracy);
   return(accuracy);
 }
+
+
+
+
+
+
 
 client.on('message', message => {
     let args = message.content.split(" ");
