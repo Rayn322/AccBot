@@ -28,14 +28,22 @@ function checkIfGuildIsAvailable(message) {
 
 var accuracy;
 var noteCount;
+var myArray = [];
 
-
-async function getSong(songID, songDifficulty, score) {
+async function fetchBeatSaver(songID) {
   var url = 'https://beatsaver.com/api/maps/detail/' + songID;
   console.log('The songID is ' + songID);
+  console.log('The songDifficulty is ' + songDifficulty);
+  console.log('The score is ' + score);
   const response = await fetch(url).catch(console.error);
   const data = await response.json();
-  console.log(data);
+  // console.log(data);
+  return(data);
+}
+
+function getSong(songID, songDifficulty, score) {
+
+  const data = fetchBeatSaver(songID);
 
   switch (songDifficulty) {
     case '1':
@@ -69,16 +77,18 @@ async function getSong(songID, songDifficulty, score) {
   if (noteCount == null) {
     console.log('There are no notes on this difficulty!');
     // message.channel.send('There are no notes on this difficulty!');
-    return(noteCount);
 
   } else if (noteCount < 13 && noteCount > 0) {
     console.log('There are less than 13 notes in this song.')
     // message.channel.send('Songs with less than 13 notes do not work at this time.')
-    return(noteCount);
 
   } else {
-    accuracy = calculateAccuracy(noteCount, score);
+    // accuracy = calculateAccuracy(noteCount, score);
     console.log('first function prints this thing' + accuracy);
+    myArray = [noteCount, parseInt(score)];
+    console.log('array at the end of getSong ' + myArray);
+    console.log('end of funciton array: ' + myArray[0] + ' and ' + myArray[1] + ' called separately');
+    return(myArray);
   }
 }
 
@@ -160,13 +170,12 @@ client.on('message', message => {
             }
             break;
         case '.acc':
-            console.log('.acc started');
-            getSong(args[1], args[2], args[3]);
-            console.log('accuracy is ' + accuracy);
-            console.log('.acc has finished.');
+            myArray = getSong(args[1], args[2], args[3]);
+            console.log('here is the same array out of the funtion ' + myArray[0] + ' ' + myArray[1]);
+            calculateAccuracy(myArray[0], myArray[1]);
             // id, difficulty, score
             // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
-            message.channel.send('Your accuracy is ' + accuracy + '%.')
+            message.channel.send('Your accuracy is ' + accuracy + '%.');
             break;
         default:
             break;
