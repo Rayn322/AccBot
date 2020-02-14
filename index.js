@@ -26,14 +26,16 @@ function checkIfGuildIsAvailable(message) {
     }
 }
 
+var accuracy;
+var noteCount;
+
+
 async function getSong(songID, songDifficulty, score) {
   var url = 'https://beatsaver.com/api/maps/detail/' + songID;
   console.log('The songID is ' + songID);
   const response = await fetch(url).catch(console.error);
   const data = await response.json();
   console.log(data);
-  var noteCount;
-  console.log(typeof songDifficulty);
 
   switch (songDifficulty) {
     case '1':
@@ -75,17 +77,18 @@ async function getSong(songID, songDifficulty, score) {
     return(noteCount);
 
   } else {
-    calculateAccuracy(noteCount, score);
+    accuracy = calculateAccuracy(noteCount, score);
+    console.log('first function prints this thing' + accuracy);
   }
 }
 
 function calculateAccuracy(noteCount, score) {
   console.log('calculateAccuracy has recieved ' + noteCount + ' as the noteCount');
-  console.log(score);
 
   var highestScorePossible = 920 * noteCount - 7245;
-  var accuracy = score / highestScorePossible;
+  accuracy = score / highestScorePossible;
   console.log('Your accuracy is ' + accuracy);
+  return(accuracy);
 }
 
 client.on('message', message => {
@@ -148,18 +151,23 @@ client.on('message', message => {
                 message.channel.send(message.author.username + ', you are on the ' + message.guild.name + ' Discord Server.');
                 break;
             }
-
+            break;
         case '=info':
             if(args[1] == 'commands') {
                 message.channel.send('Currently the only commands are "dm me", "what is my avatar", =ping, =hi, =invite, and =whereami.');
             } else {
                 message.channel.send('I am the very cool bot. Do =info commands to see my commands.');
             }
+            break;
         case '.acc':
+            console.log('.acc started');
             getSong(args[1], args[2], args[3]);
-          // id, difficulty, score
-          // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
-          //  message.channel.send('Your accuracy is ' + accuracy + '%.')
+            console.log('accuracy is ' + accuracy);
+            console.log('.acc has finished.');
+            // id, difficulty, score
+            // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
+            message.channel.send('Your accuracy is ' + accuracy + '%.')
+            break;
         default:
             break;
     }
