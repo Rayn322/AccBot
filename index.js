@@ -15,6 +15,10 @@ client.on('ready', () => {
     console.log('The bot is online!');
 })
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // function for making sure the guild can be accessed. Currently crashes if the guild can't be accessed :)
 function checkIfGuildIsAvailable(message) {
     if (message) {
@@ -29,6 +33,7 @@ function checkIfGuildIsAvailable(message) {
 var accuracy;
 var noteCount;
 var myArray = [];
+var data;
 
 async function fetchBeatSaver(songID) {
   var url = 'https://beatsaver.com/api/maps/detail/' + songID;
@@ -36,14 +41,16 @@ async function fetchBeatSaver(songID) {
   // console.log('The songDifficulty is ' + songDifficulty);
   // console.log('The score is ' + score);
   const response = await fetch(url).catch(console.error);
-  const data = await response.json();
-  // console.log(data);
+  data = await response.json();
+  await sleep(500);
+  console.log(data);
+  console.log(data.metadata.characteristics[0].difficulties.expertPlus.notes);
   return(data);
 }
 
 function getSong(songID, songDifficulty, score) {
 
-  const data = fetchBeatSaver(songID);
+  data = fetchBeatSaver(songID);
 
   switch (songDifficulty) {
     case '1':
@@ -176,12 +183,14 @@ client.on('message', message => {
             }
             break;
         case '.acc':
-            myArray = getSong(args[1], args[2], args[3]);
-            console.log('here is the same array out of the funtion ' + myArray[0] + ' ' + myArray[1]);
+            fetchBeatSaver(args[1]);
+            // myArray = getSong(args[1], args[2], args[3]);
+            // console.log('here is the same array out of the funtion ' + myArray[0] + ' ' + myArray[1]);
             calculateAccuracy(myArray[0], myArray[1]);
             // id, difficulty, score
             // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
             message.channel.send('Your accuracy is ' + accuracy + '%.');
+            console.log('Message sent')
             break;
         default:
             break;
