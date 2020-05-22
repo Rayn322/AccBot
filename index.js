@@ -23,13 +23,12 @@ client.on('message', message => {
 
     switch(args[0]){
         case '.acc':
-            // fetchBeatSaver(args[1]);
             // myArray = getSong(args[1], args[2], args[3]);
             // console.log('here is the same array out of the funtion ' + myArray[0] + ' ' + myArray[1]);
             // calculateAccuracy(myArray[0], myArray[1]);
             // id, difficulty, score
             // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
-            fetchBeatSaver();
+            fetchBeatSaver(args[1]);
             message.channel.send('Your accuracy is ' + accuracy + '%.');
             break;
         default:
@@ -41,8 +40,8 @@ client.on('message', message => {
 var accuracy = 10;
 var songJson;
 
-function fetchBeatSaver() {
-  let url = 'https://beatsaver.com/api/maps/detail/b';
+function fetchBeatSaver(id) {
+  let url = 'https://beatsaver.com/api/maps/detail/' + id;
   // songJson = loadJSON(url);
   // console.log(songJson);
 
@@ -59,6 +58,7 @@ function fetchBeatSaver() {
   .then((data) => {
     songJson = data;
     console.log(songJson);
+    return(songJson);
   });
 }
 
