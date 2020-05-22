@@ -9,7 +9,7 @@
   "author": "Ryan",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.5.1",
+    "discord.js": "^11.6.4",
     "node-fetch": "^2.6.0"
   }
 }
