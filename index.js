@@ -7,33 +7,33 @@ const token = 'NjU2MzA1ODM2MjA5MjA5MzQ3.Xfgusw.1NMtQ3P5WP6fz1slFzbz_DeDB8c';
 
 client.on('ready', () => {
   // makes status "Listening to your Discord server"
-    client.user.setPresence({
-      game: {
-          name: 'your Discord server',
-          type: "LISTENING"
-      }
-    });
-    console.log('The bot is online!');
+  client.user.setPresence({
+    game: {
+      name: 'your Discord server',
+      type: "LISTENING"
+    }
+  });
+  console.log('The bot is online!');
 })
 
 
 
 client.on('message', message => {
-    let args = message.content.split(" ");
+  let args = message.content.split(" ");
 
-    switch(args[0]){
-        case '.acc':
-            // myArray = getSong(args[1], args[2], args[3]);
-            // console.log('here is the same array out of the funtion ' + myArray[0] + ' ' + myArray[1]);
-            // calculateAccuracy(myArray[0], myArray[1]);
-            // id, difficulty, score
-            // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
-            fetchBeatSaver(args[1]);
-            message.channel.send('Your accuracy is ' + accuracy + '%.');
-            break;
-        default:
-            break;
-    }
+  switch (args[0]) {
+    case '.acc':
+      // id, difficulty, score
+      // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
+      if (getAcc(fetchBeatSaver(args[1]), args[2], args[3]) == 0) {
+        message.channel.send("Error of some type. I haven't bothered telling which one so bug me to do that.");
+      } else {
+        message.channel.send('Your accuracy is ' + accuracy + '%');
+      };
+      break;
+    default:
+      break;
+  }
 
 })
 
@@ -54,13 +54,58 @@ function fetchBeatSaver(id) {
   // });
 
   fetch(url)
-  .then((res) => res.json())
-  .then((data) => {
-    songJson = data;
-    console.log(songJson);
-    return(songJson);
-  });
-}
+    .then((res) => res.json())
+    .then((data) => {
+      songJson = data;
+      console.log(songJson);
+      return (songJson);
+    });
+};
 
+function getAcc(songJson, difficulty, score) {
+  switch (difficulty) {
+    case '1':
+      if (songJson.metadata.difficulties.easy) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.easy.notes;
+        break;
+      } else {
+        return 0;
+        break;
+      };
+    case '2':
+      if (songJson.metadata.difficulties.normal) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.normal.notes;
+        break;
+      } else {
+        return 0;
+        break
+      };
+    case '3':
+      if (songJson.metadata.difficulties.hard) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.hard.notes;
+        break;
+      } else {
+        return 0;
+        break
+      };
+    case '4':
+      if (songJson.metadata.difficulties.expert) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.expert.notes;
+        break;
+      } else {
+        return 0;
+        break
+      };
+    case '5':
+      if (songJson.metadata.difficulties.expertPlus) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.expertPlus.notes;
+        break;
+      } else {
+        return 0;
+        break
+      };
+  };
+  console.log(noteCount);
+};
 
 client.login(token);
