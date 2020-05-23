@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fetch = require('node-fetch');
-const https = require('https');
 
 const token = 'NjU2MzA1ODM2MjA5MjA5MzQ3.Xfgusw.1NMtQ3P5WP6fz1slFzbz_DeDB8c';
 
@@ -25,11 +24,10 @@ client.on('message', message => {
     case '.acc':
       // id, difficulty, score
       // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
-      if (getAcc(fetchBeatSaver(args[1]), args[2], args[3]) == 0) {
-        message.channel.send("Error of some type. I haven't bothered telling which one so bug me to do that.");
-      } else {
-        message.channel.send('Your accuracy is ' + accuracy + '%');
-      };
+      accRequest = message;
+      fetchBeatSaver(args[1], args[2], args[3]);
+      console.log('message sent');
+      console.log('accuracy at root ' + accuracy);
       break;
     default:
       break;
@@ -37,75 +35,61 @@ client.on('message', message => {
 
 })
 
+var accRequest;
 var accuracy = 10;
+var result = 'Not calculated';
 var songJson;
 
-function fetchBeatSaver(id) {
+function fetchBeatSaver(id, difficulty, score) {
   let url = 'https://beatsaver.com/api/maps/detail/' + id;
-  // songJson = loadJSON(url);
-  // console.log(songJson);
-
-  // fetch(url)
-  // .then(function(res){
-  //   return res.json();
-  // })
-  // .then(function(data){
-  //   console.log(data);
-  // });
 
   fetch(url)
     .then((res) => res.json())
     .then((data) => {
       songJson = data;
+      console.log('json aquired')
       console.log(songJson);
-      return (songJson);
+      return (getAcc(songJson, difficulty, score));
     });
 };
 
 function getAcc(songJson, difficulty, score) {
+  console.log('getacc starts')
   switch (difficulty) {
     case '1':
-      if (songJson.metadata.difficulties.easy) {
-        var noteCount = songJson.metadata.characteristics[0].difficulties.easy.notes;
-        break;
-      } else {
-        return 0;
-        break;
-      };
+      var noteCount = songJson.metadata.characteristics[0].difficulties.easy.notes;
+      break;
     case '2':
-      if (songJson.metadata.difficulties.normal) {
-        var noteCount = songJson.metadata.characteristics[0].difficulties.normal.notes;
-        break;
-      } else {
-        return 0;
-        break
-      };
+      var noteCount = songJson.metadata.characteristics[0].difficulties.normal.notes;
+      break;
     case '3':
-      if (songJson.metadata.difficulties.hard) {
-        var noteCount = songJson.metadata.characteristics[0].difficulties.hard.notes;
-        break;
-      } else {
-        return 0;
-        break
-      };
+      var noteCount = songJson.metadata.characteristics[0].difficulties.hard.notes;
+      break;
     case '4':
-      if (songJson.metadata.difficulties.expert) {
-        var noteCount = songJson.metadata.characteristics[0].difficulties.expert.notes;
-        break;
-      } else {
-        return 0;
-        break
-      };
+      var noteCount = songJson.metadata.characteristics[0].difficulties.expert.notes;
+      break;
     case '5':
-      if (songJson.metadata.difficulties.expertPlus) {
-        var noteCount = songJson.metadata.characteristics[0].difficulties.expertPlus.notes;
-        break;
-      } else {
-        return 0;
-        break
-      };
+      var noteCount = songJson.metadata.characteristics[0].difficulties.expertPlus.notes;
+      break;
   };
   console.log(noteCount);
+
+  if (noteCount == null) {
+    console.log('There are no notes on this difficulty!');
+
+
+  } else if (noteCount < 13 && noteCount > 0) {
+    console.log('There are less than 13 notes in this song.')
+
+  } else {
+    var maxScore = 920 * noteCount - 7245;
+    console.log('max score is ' + maxScore);
+    console.log(maxScore)
+    accuracy = parseInt(score) / maxScore * 100;
+    console.log('accuracy is ' + accuracy);
+    accRequest.channel.send('Your accuracy is ' + accuracy + '%');
+    return (accuracy);
+  }
 };
 
 client.login(token);
