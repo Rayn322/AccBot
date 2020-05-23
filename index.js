@@ -26,8 +26,6 @@ client.on('message', message => {
       // easy - 1, normal - 2, hard - 3, expert - 4, expert plus - 5
       accRequest = message;
       fetchBeatSaver(args[1], args[2], args[3]);
-      console.log('message sent');
-      console.log('accuracy at root ' + accuracy);
       break;
     default:
       break;
@@ -37,8 +35,8 @@ client.on('message', message => {
 
 var accRequest;
 var accuracy = 10;
-var result = 'Not calculated';
 var songJson;
+var result;
 
 function fetchBeatSaver(id, difficulty, score) {
   let url = 'https://beatsaver.com/api/maps/detail/' + id;
@@ -47,49 +45,83 @@ function fetchBeatSaver(id, difficulty, score) {
     .then((res) => res.json())
     .then((data) => {
       songJson = data;
-      console.log('json aquired')
-      console.log(songJson);
-      return (getAcc(songJson, difficulty, score));
+      console.log('json aquired');
+      getAcc(songJson, difficulty, score);
     });
 };
 
 function getAcc(songJson, difficulty, score) {
-  console.log('getacc starts')
+  console.log('getacc starts');
   switch (difficulty) {
     case '1':
-      var noteCount = songJson.metadata.characteristics[0].difficulties.easy.notes;
+      if (songJson.metadata.difficulties.easy) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.easy.notes;
+      } else {
+        result = "BadDiff";
+      };
       break;
     case '2':
-      var noteCount = songJson.metadata.characteristics[0].difficulties.normal.notes;
+      if (songJson.metadata.difficulties.normal) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.normal.notes;
+      } else {
+        result = "BadDiff";
+      };
       break;
     case '3':
-      var noteCount = songJson.metadata.characteristics[0].difficulties.hard.notes;
+      if (songJson.metadata.difficulties.hard) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.hard.notes;
+      } else {
+        result = "BadDiff";
+      };
       break;
     case '4':
-      var noteCount = songJson.metadata.characteristics[0].difficulties.expert.notes;
+      if (songJson.metadata.difficulties.expert) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.expert.notes;
+      } else {
+        result = "BadDiff";
+      };
       break;
     case '5':
-      var noteCount = songJson.metadata.characteristics[0].difficulties.expertPlus.notes;
+      if (songJson.metadata.difficulties.expertPlus) {
+        var noteCount = songJson.metadata.characteristics[0].difficulties.expertPlus.notes;
+      } else {
+        result = "BadDiff";
+      };
       break;
   };
   console.log(noteCount);
 
-  if (noteCount == null) {
+  if (result == 'BadDiff') {
     console.log('There are no notes on this difficulty!');
 
-
   } else if (noteCount < 13 && noteCount > 0) {
-    console.log('There are less than 13 notes in this song.')
-
+    console.log('There are less than 13 notes in this song.');
+    result = 'Unsupported';
   } else {
-    var maxScore = 920 * noteCount - 7245;
-    console.log('max score is ' + maxScore);
-    console.log(maxScore)
-    accuracy = parseInt(score) / maxScore * 100;
-    console.log('accuracy is ' + accuracy);
-    accRequest.channel.send('Your accuracy is ' + accuracy + '%');
-    return (accuracy);
-  }
+    result = 'Good';
+  };
+
+  switch (result) {
+    case 'BadDiff':
+      accRequest.channel.send("That difficulty has no notes or doesn't exist.");
+      result = 'None';
+      break;
+    case 'Unsupported':
+      accRequest.channel.send("We currently don't support songs with less than 13 notes.");
+      result = 'None';
+      break;
+    case 'Good':
+      var maxScore = 920 * noteCount - 7245;
+      console.log('max score is ' + maxScore);
+      console.log(maxScore)
+      accuracy = parseInt(score) / maxScore * 100;
+      console.log('accuracy is ' + accuracy);
+      accRequest.channel.send('Your accuracy is ' + accuracy + '%.');
+      result = 'None';
+      break;
+    default:
+      break;
+  };
 };
 
 client.login(token);
