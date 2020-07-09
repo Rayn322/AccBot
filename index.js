@@ -1,8 +1,10 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fetch = require('node-fetch');
+const data = require('.\\token.json');
 
-const token = 'NjU2MzA1ODM2MjA5MjA5MzQ3.Xfgusw.1NMtQ3P5WP6fz1slFzbz_DeDB8c';
+const token = data.token;
+console.log(data.token);
 
 client.on('ready', () => {
   // makes status "Listening to your Discord server"
