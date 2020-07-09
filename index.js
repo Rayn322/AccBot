@@ -57,60 +57,60 @@ function getAcc(songJson, difficulty, score) {
       if (songJson.metadata.difficulties.easy) {
         var noteCount = songJson.metadata.characteristics[0].difficulties.easy.notes;
       } else {
-        result = "BadDiff";
+        result = 0;
       };
       break;
     case '2':
       if (songJson.metadata.difficulties.normal) {
         var noteCount = songJson.metadata.characteristics[0].difficulties.normal.notes;
       } else {
-        result = "BadDiff";
+        result = 0;
       };
       break;
     case '3':
       if (songJson.metadata.difficulties.hard) {
         var noteCount = songJson.metadata.characteristics[0].difficulties.hard.notes;
       } else {
-        result = "BadDiff";
+        result = 0;
       };
       break;
     case '4':
       if (songJson.metadata.difficulties.expert) {
         var noteCount = songJson.metadata.characteristics[0].difficulties.expert.notes;
       } else {
-        result = "BadDiff";
+        result = 0;
       };
       break;
     case '5':
       if (songJson.metadata.difficulties.expertPlus) {
         var noteCount = songJson.metadata.characteristics[0].difficulties.expertPlus.notes;
       } else {
-        result = "BadDiff";
+        result = 0;
       };
       break;
   };
   console.log(noteCount);
 
-  if (result == 'BadDiff') {
+  if (result == 0) {
     console.log('There are no notes on this difficulty!');
 
   } else if (noteCount < 13 && noteCount > 0) {
     console.log('There are less than 13 notes in this song.');
-    result = 'Unsupported';
+    result = 1;
   } else {
-    result = 'Good';
+    result = 2;
   };
 
   switch (result) {
-    case 'BadDiff':
+    case 0:
       accRequest.channel.send("That difficulty has no notes or doesn't exist.");
       result = 'None';
       break;
-    case 'Unsupported':
+    case 1:
       accRequest.channel.send("We currently don't support songs with less than 13 notes.");
       result = 'None';
       break;
-    case 'Good':
+    case 2:
       var maxScore = 920 * noteCount - 7245;
       console.log('max score is ' + maxScore);
       console.log(maxScore)
