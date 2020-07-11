@@ -1,10 +1,9 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fetch = require('node-fetch');
-const data = require('.\\token.json');
+const tokenJSON = require('.\\token.json');
 
-const token = data.token;
-console.log(data.token);
+const token = tokenJSON.token;
 
 client.on('ready', () => {
   // makes status "Listening to your Discord server"
@@ -46,9 +45,14 @@ function fetchBeatSaver(id, difficulty, score) {
   fetch(url)
     .then((res) => res.json())
     .then((data) => {
+      console.log(data);
       songJson = data;
       console.log('json aquired');
       getAcc(songJson, difficulty, score);
+    })
+    .catch(err => {
+      console.error(err);
+      console.log(data);
     });
 };
 
